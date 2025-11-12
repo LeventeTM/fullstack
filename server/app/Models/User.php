@@ -53,4 +53,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(Basket::class);
     }
+
+    /**
+     * Egy felhasználónak több rendelése is lehet.
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
 }

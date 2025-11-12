@@ -11,9 +11,15 @@ class Item extends Model
 
     protected $fillable = [
         'basket_id',
+        'order_id',
         'name',
         'price',
         'quantity',
+        'category',
+        'description',
+        'stock',
+        'weight',
+        'image',
         // 'item_id' helyett itt a Laravel alapértelmezett 'id'-t használjuk
     ];
 
@@ -30,4 +36,23 @@ class Item extends Model
     {
         return $this->price * $this->quantity;
     }
+
+    /**
+     * Reláció a rendeléshez (egy termék egy rendeléshez is tartozhat)
+     */
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    /**
+     * Egy termék több rendeléshez is tartozhat (több-vagy-több kapcsolat).
+     */
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class, 'order_item')
+                    ->withPivot('quantity', 'price')
+                    ->withTimestamps();
+    }
+
 }
