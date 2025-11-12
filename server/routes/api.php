@@ -10,7 +10,9 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\OrderController;
 
 Route::post('login', [AuthController::class, 'login'])->name('api.login');
-
+Route::get('users/{user}/orders', [UserController::class, 'orders']); // kiegészítő
+Route::apiResource('items', ItemController::class);
+Route::apiResource('orders', OrderController::class);
 //Users routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [UserController::class, 'index']) -> name('api.user.users'); //gets all the users

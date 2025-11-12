@@ -1,39 +1,22 @@
 import { Component } from '@angular/core';
-import { JsonPipe } from '@angular/common';
-import { AuthService } from './core/auth'; // ✅ use your existing file path
+import { CommonModule } from '@angular/common';
+import { ItemListComponent } from './components/item-list/item-list';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [JsonPipe],
+  imports: [CommonModule, ItemListComponent],
   template: `
-    <button (click)="login()">Login</button>
-    <button (click)="me()">Me</button>
-    <button (click)="projects()">Projects</button>
-    <button (click)="logout()">Logout</button>
-    <pre>{{ data | json }}</pre>
+    <main class="app-container">
+      <header>
+        <h1>🛒 Terméklista</h1>
+      </header>
+
+      <section>
+        <app-item-list></app-item-list>
+      </section>
+    </main>
   `,
+  styleUrls: ['./app.scss'],
 })
-export class App {
-  data: any;
-
-  constructor(private auth: AuthService) {}
-
-  login() {
-    this.auth.csrf().subscribe(() => {
-      this.auth.login('user@example.com', 'password').subscribe((res) => (this.data = res));
-    });
-  }
-
-  me() {
-    this.auth.me().subscribe((res) => (this.data = res));
-  }
-
-  projects() {
-    this.auth.projects().subscribe((res) => (this.data = res));
-  }
-
-  logout() {
-    this.auth.logout().subscribe((res) => (this.data = res));
-  }
-}
+export class App {}

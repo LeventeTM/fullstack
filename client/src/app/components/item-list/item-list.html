@@ -1,0 +1,17 @@
+<div class="toolbar">
+  <label for="category">Kategória:</label>
+  <select
+    id="category"
+    [value]="selectedCategory()"
+    (change)="setCategory($any($event.target).value)"
+  >
+    <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+  </select>
+</div>
+
+<div *ngIf="loading()" class="state">Betöltés…</div>
+<div *ngIf="!loading() && error()" class="state error">{{ error() }}</div>
+
+<section *ngIf="!loading() && !error()" class="grid">
+  <app-item-card *ngFor="let item of filtered()" [item]="item"></app-item-card>
+</section>
