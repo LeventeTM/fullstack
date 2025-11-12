@@ -16,5 +16,4 @@ php artisan serve --host=127.0.0.1 --port=8000
 
 ### Frontend
 cd client
-npm i
-npm start
+ng serve --proxy-config proxy.conf.json
