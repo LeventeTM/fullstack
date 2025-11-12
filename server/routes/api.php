@@ -6,8 +6,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ItemController;
-use App\Http\Controllers\OrderController;
 
 Route::post('login', [AuthController::class, 'login'])->name('api.login');
 
