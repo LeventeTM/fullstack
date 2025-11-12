@@ -1,0 +1,19 @@
+.toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 0 0 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.state {
+  padding: 12px;
+}
+.state.error {
+  color: #b91c1c;
+}
