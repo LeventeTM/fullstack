@@ -1,0 +1,74 @@
+<div class="checkout-container" style="padding: 24px; max-width: 1200px; margin: 0 auto;">
+
+  <h2>Rendelés véglegesítése</h2>
+  <nz-divider></nz-divider>
+
+  <div *ngIf="cartItems().length === 0" style="text-align: center; padding: 50px;">
+    <span nz-icon nzType="shopping-cart" style="font-size: 48px; color: #ccc;"></span>
+    <h3>Üres a kosarad</h3>
+    <button nz-button nzType="primary" routerLink="/">Vásárlás folytatása</button>
+  </div>
+
+  <div *ngIf="cartItems().length > 0" style="display: flex; gap: 24px; flex-wrap: wrap;">
+
+    <div style="flex: 2; min-width: 300px;">
+      <nz-table #basicTable [nzData]="cartItems()" [nzShowPagination]="false">
+        <thead>
+          <tr>
+            <th>Termék</th>
+            <th>Egységár</th>
+            <th>Mennyiség</th>
+            <th>Részösszeg</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of basicTable.data">
+            <td>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <img [src]="data.image" [alt]="data.name" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                <span>{{ data.name }}</span>
+              </div>
+            </td>
+            <td>{{ data.price }} Ft</td>
+            <td>{{ data.quantity }} db</td>
+            <td><strong>{{ data.price * data.quantity }} Ft</strong></td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+
+    <div style="flex: 1; min-width: 300px;">
+      <nz-card nzTitle="Rendelés összesítése" [nzExtra]="extraTemplate">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+          <span>Részösszeg:</span>
+          <span>{{ totalPrice() }} Ft</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+          <span>Szállítás:</span>
+          <span>Ingyenes</span>
+        </div>
+        <nz-divider></nz-divider>
+        <div style="display: flex; justify-content: space-between; font-size: 1.2em; font-weight: bold; margin-bottom: 20px;">
+          <span>Végösszeg:</span>
+          <span style="color: #1890ff;">{{ totalPrice() }} Ft</span>
+        </div>
+
+        <button
+          nz-button
+          nzType="primary"
+          nzBlock
+          nzSize="large"
+          [nzLoading]="isLoading"
+          (click)="submitOrder()"
+        >
+          Rendelés leadása
+        </button>
+      </nz-card>
+    </div>
+
+  </div>
+</div>
+
+<ng-template #extraTemplate>
+  <span nz-icon nzType="security-scan"></span>
+</ng-template>

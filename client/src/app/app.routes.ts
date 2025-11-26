@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { Checkout } from './components/checkout/checkout';
 
 export const routes: Routes = [
   {
@@ -9,5 +10,8 @@ export const routes: Routes = [
   {
     path: 'admin',
     loadComponent: () => import('./components/admin/admin').then((m) => m.Admin),
+  },
+  {
+    path: 'checkout', component: Checkout
   },
 ];

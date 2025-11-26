@@ -11,6 +11,8 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 
 import { CategoryService } from '../../services/category';
+import { CartDrawer } from "../cart-drawer/cart-drawer";
+import { ItemCardComponent } from "../item-card/item-card";
 
 @Component({
   selector: 'app-menu',
@@ -23,11 +25,14 @@ import { CategoryService } from '../../services/category';
     NzIconModule,
     NzDropDownModule,
     NzMenuModule,
-  ],
+    CartDrawer,
+    ItemCardComponent
+],
   templateUrl: './menu.html',
   styleUrls: ['./menu.scss'],
 })
 export class Menu implements OnInit {
+products: any;
   constructor(public readonly categoryService: CategoryService, private readonly router: Router) {}
 
   ngOnInit(): void {

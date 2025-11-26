@@ -23,6 +23,15 @@
   </div>
 
   <div class="menu-right">
+    <div>
+      <div style="padding: 20px;">
+        <app-cart-drawer></app-cart-drawer>
+      </div>
+
+      <div class="products-grid">
+        <app-item-card *ngFor="let p of products" [item]="p"></app-item-card>
+      </div>
+    </div>
     <button nz-button nzType="primary" routerLink="/admin">Admin</button>
   </div>
 </nz-header>
