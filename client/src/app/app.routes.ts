@@ -14,4 +14,5 @@ export const routes: Routes = [
   {
     path: 'checkout', component: Checkout
   },
+  { path: 'login', loadComponent: () => import('./components/login/login').then(m => m.LoginComponent) },
 ];

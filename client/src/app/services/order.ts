@@ -11,8 +11,6 @@ export class OrderService {
   private apiUrl = 'https://localhost/api/orders';
 
   placeOrder(items: CartItem[], total: number) {
-    // Összeállítjuk a backendnek megfelelő formátumot
-    // Általában csak a product ID és a quantity kell a backendnek
     const orderData = {
       items: items.map(i => ({ productId: i.id, quantity: i.quantity })),
       totalAmount: total,
