@@ -1,16 +1,22 @@
-.app-container {
+.app-layout {
+  min-height: 100vh;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #001529;
+}
+
+.app-header h1 {
+  color: #fff;
+  margin: 0;
+}
+
+.app-content {
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-family: Arial, sans-serif;
-
-  header {
-    margin-bottom: 2rem;
-    text-align: center;
-  }
-
-  h1 {
-    font-size: 2rem;
-    color: #333;
-  }
+  margin: 24px auto;
+  padding: 24px;
+  background: #f5f5f5;
 }

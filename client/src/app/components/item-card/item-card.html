@@ -1,14 +1,22 @@
-<article class="card">
+<nz-card class="item-card" nzHoverable>
   <div class="thumb">
-    <img [src]="item.image" [alt]="item.name" loading="lazy" />
+    <img
+      nz-image
+      [nzSrc]="item.image"
+      [alt]="item.name"
+      style="width: 100%; height: 100%; object-fit: cover"
+    />
   </div>
+
   <h3 class="name">{{ item.name }}</h3>
+
   <div class="meta">
-    <span class="category">{{ item.category }}</span>
+    <nz-tag nzColor="blue">{{ item.category }}</nz-tag>
     <span class="price">{{ item.price | currency : 'HUF' : 'symbol-narrow' }}</span>
   </div>
+
   <div class="submeta">
     <span>Raktár: {{ item.stock }}</span>
     <span>Súly: {{ item.weight }} kg</span>
   </div>
-</article>
+</nz-card>

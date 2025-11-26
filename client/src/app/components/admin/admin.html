@@ -1,0 +1,31 @@
+<h2>Admin – Rendelések</h2>
+
+<nz-table [nzData]="orders()" nzBordered [nzShowPagination]="false">
+  <thead>
+    <tr>
+      <th>Vevő</th>
+      <th>Végösszeg (Ft)</th>
+      <th>Termék darabszám</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let order of orders()">
+      <td>{{ order.user?.name }}</td>
+      <td>{{ getTotalAmount(order) | number : '1.0-0' }} Ft</td>
+      <td>{{ getTotalQty(order) }}</td>
+    </tr>
+  </tbody>
+</nz-table>
+
+<ng-template #totalTemplate let-total let-range="range">
+  Összesen {{ total }} rendelés ({{ range[0] }}–{{ range[1] }})
+</ng-template>
+
+<nz-pagination
+  [nzPageIndex]="pageIndex()"
+  [nzPageSize]="pageSize()"
+  [nzTotal]="total()"
+  [nzShowTotal]="totalTemplate"
+  (nzPageIndexChange)="onPageChange($event)"
+></nz-pagination>

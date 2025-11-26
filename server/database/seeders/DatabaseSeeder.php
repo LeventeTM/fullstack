@@ -26,8 +26,40 @@ class DatabaseSeeder extends Seeder
 
         // 1. Termékek létrehozása
         $itemCount = 100;
-        Item::factory($itemCount)->create();
-        $this->command->info("{$itemCount} termék létrehozva.");
+        $usedCombos = [];
+        $itemsToInsert = [];
+        $maxAttempts = $itemCount * 10; // biztonsági limit, hogy ne fussunk végtelen ciklusba, ha esetleg nem találnánk elérhető combot, mert már létezik
+        $attempts = 0;
+        $created = 0;
+        
+        while (count($itemsToInsert) < $itemCount && $attempts < $maxAttempts) {
+            $attempts++;
+            $item = Item::factory()->make();
+
+            // A márka az első szó, utána jön a terméknév
+            $parts = explode(' ', $item->name, 2);
+            $brand = $parts[0] ?? null;
+            $productName = $parts[1] ?? null;
+
+            // Ha valamiért nem sikerül értelmesen szétvágni, inkább ugrunk
+            if (!$brand || !$productName) {
+                continue;
+            }
+
+            $key = $brand . '|' . $productName;
+
+            // Ha ez a (márka + terméknév) combo már létezik, generáljunk újat
+            if (isset($usedCombos[$key])) {
+                continue;
+            }
+
+            // Elmentjük az egyedi változatot
+            $usedCombos[$key] = true;
+            $item->save();   // <-- NINCS toArray(), nincs bulk insert
+            $created++;
+        }
+
+        $this->command->info("{$created} egyedi (márka + terméknév) termék létrehozva.");
 
         // FIX FELHASZNÁLÓK
         // 1. Admin felhasználó létrehozása a Factory alapértelmezett értékeinek felülírásával

@@ -1,17 +1,34 @@
 <div class="toolbar">
   <label for="category">Kategória:</label>
-  <select
+
+  <nz-select
     id="category"
-    [value]="selectedCategory()"
-    (change)="setCategory($any($event.target).value)"
+    [ngModel]="categoryService.selected()"
+    (ngModelChange)="setCategory($event)"
+    nzSize="large"
+    style="min-width: 200px"
   >
-    <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
-  </select>
+    <nz-option
+      *ngFor="let c of categories"
+      [nzValue]="c"
+      [nzLabel]="c === 'minden' ? 'Minden' : c"
+    ></nz-option>
+  </nz-select>
 </div>
 
-<div *ngIf="loading()" class="state">Betöltés…</div>
-<div *ngIf="!loading() && error()" class="state error">{{ error() }}</div>
+<nz-spin *ngIf="loading()" nzTip="Betöltés..."></nz-spin>
 
-<section *ngIf="!loading() && !error()" class="grid">
-  <app-item-card *ngFor="let item of filtered()" [item]="item"></app-item-card>
-</section>
+<nz-alert *ngIf="!loading() && error()" nzType="error" [nzMessage]="error()" nzShowIcon></nz-alert>
+
+<div *ngIf="!loading() && !error()">
+  <nz-empty
+    *ngIf="filtered().length === 0"
+    nzDescription="Nincs termék ebben a kategóriában"
+  ></nz-empty>
+
+  <div *ngIf="filtered().length > 0" nz-row nzGutter="16">
+    <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="8" [nzLg]="6" *ngFor="let item of filtered()">
+      <app-item-card [item]="item"></app-item-card>
+    </div>
+  </div>
+</div>

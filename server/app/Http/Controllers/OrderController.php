@@ -14,7 +14,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        return Order::with(['user','items'])->latest()->paginate(20);
+        return Order::with(['user','items'])->latest()->paginate(5);
     }
 
     /**

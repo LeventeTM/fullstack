@@ -1,0 +1,28 @@
+<nz-header class="menu-header">
+  <div class="menu-left">
+    <a class="logo" routerLink="/">MyShop</a>
+
+    <button nz-button nz-dropdown [nzDropdownMenu]="categoryMenu" nzTrigger="click">
+      {{
+        categoryService.selected() === 'minden' ? 'Minden kategória' : categoryService.selected()
+      }}
+      <span nz-icon nzType="down"></span>
+    </button>
+
+    <nz-dropdown-menu #categoryMenu="nzDropdownMenu">
+      <ul nz-menu>
+        <li
+          nz-menu-item
+          *ngFor="let c of categoryService.categories()"
+          (click)="onCategorySelect(c)"
+        >
+          {{ c === 'minden' ? 'Minden' : c }}
+        </li>
+      </ul>
+    </nz-dropdown-menu>
+  </div>
+
+  <div class="menu-right">
+    <button nz-button nzType="primary" routerLink="/admin">Admin</button>
+  </div>
+</nz-header>
