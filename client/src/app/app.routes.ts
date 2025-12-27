@@ -1,18 +1,43 @@
 import { Routes } from '@angular/router';
 import { Checkout } from './components/checkout/checkout';
+import { authGuard } from './guards/auth.guard';
+import { loginGuard } from './guards/login.guard';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
+  { path: '', redirectTo: 'items', pathMatch: 'full' },
+  { path: 'login',
+    canActivate: [loginGuard],
+    loadComponent: () => import('./components/login/login').then(m => m.LoginComponent)
+  },
+  {
+    path: 'register',
+    canActivate: [loginGuard],
+    loadComponent: () => import('./components/register/register').then(m => m.RegisterComponent)
+  },
   {
     path: '',
-    loadComponent: () =>
-      import('./components/item-list/item-list').then((m) => m.ItemListComponent),
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'items',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./components/item-list/item-list').then((m) => m.ItemListComponent),
+      },
+      {
+        path: 'admin',
+        canActivate: [adminGuard],
+        loadComponent: () => import('./components/admin/admin').then((m) => m.Admin),
+      },
+      {
+        path: 'checkout', component: Checkout
+      },
+    ]
   },
+
   {
-    path: 'admin',
-    loadComponent: () => import('./components/admin/admin').then((m) => m.Admin),
+    path: '**',
+    redirectTo: 'items'
   },
-  {
-    path: 'checkout', component: Checkout
-  },
-  { path: 'login', loadComponent: () => import('./components/login/login').then(m => m.LoginComponent) },
 ];

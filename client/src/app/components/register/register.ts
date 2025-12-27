@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth';
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 // NG-ZORRO
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -13,16 +14,24 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-register',
   standalone: true,
   imports: [CommonModule, RouterModule, ReactiveFormsModule, NzFormModule, NzInputModule, NzButtonModule, NzCardModule, NzIconModule],
   template: `
     <div style="display: flex; justify-content: center; align-items: center; height: 100%; background: #f0f2f5;">
       <nz-card style="width: 400px; text-align: center;" [nzBordered]="false">
         <span nz-icon nzType="user" style="font-size: 40px; color: #1890ff; margin-bottom: 20px;"></span>
-        <h2>Bejelentkezés</h2>
+        <h2>Regisztráció</h2>
 
-        <form nz-form [formGroup]="loginForm" (ngSubmit)="submit()">
+        <form nz-form [formGroup]="registerForm" (ngSubmit)="submit()">
+          <nz-form-item>
+            <nz-form-control>
+              <nz-input-group nzPrefixIcon="mail">
+                <input type="input" nz-input formControlName="name" placeholder="Name" />
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+
           <nz-form-item>
             <nz-form-control>
               <nz-input-group nzPrefixIcon="mail">
@@ -39,18 +48,26 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
             </nz-form-control>
           </nz-form-item>
 
-          <button nz-button nzType="primary" nzBlock [nzLoading]="isLoading" [disabled]="loginForm.invalid">
+          <nz-form-item>
+            <nz-form-control>
+              <nz-input-group nzPrefixIcon="lock">
+                <input type="password" nz-input formControlName="password_confirmation" placeholder="Jelszó mégegyszer" />
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+
+          <button nz-button nzType="primary" nzBlock [nzLoading]="isLoading" [disabled]="registerForm.invalid">
             Belépés
           </button>
         </form>
-        <div style="margin-top: 20px;">Nincs fiókod? <br> <a routerLink="/register" style="cursor: pointer; color: #1890ff;">
-          Regisztráció
+        <div style="margin-top: 20px;">Már van fiókod? <br> <a routerLink="/login" style="cursor: pointer; color: #1890ff;">
+          Bejelentkezés
         </a></div>
       </nz-card>
     </div>
   `
 })
-export class LoginComponent {
+export class RegisterComponent {
   fb = inject(FormBuilder);
   authService = inject(AuthService);
   router = inject(Router);
@@ -58,26 +75,27 @@ export class LoginComponent {
 
   isLoading = false;
 
-  loginForm = this.fb.group({
+  registerForm = this.fb.group({
+    name: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]]
+    password: ['', [Validators.required]],
+    password_confirmation: ['', [Validators.required]]
   });
 
   submit() {
-    if (this.loginForm.valid) {
+    if (this.registerForm.valid) {
       this.isLoading = true;
-      const { email, password } = this.loginForm.value;
+      const { name, email, password, password_confirmation } = this.registerForm.value;
 
-      this.authService.login(email!, password!).subscribe({
+      this.authService.register(name!, email!, password!, password_confirmation!).subscribe({
         next: () => {
-          this.msg.success('Sikeres bejelentkezés');
+          this.msg.success('Sikeres regisztráció!');
           this.isLoading = false;
-          // Frontend routing: átirányítunk a főoldalra
-          this.router.navigate(['/items']);
+          this.router.navigate(['/login']);
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error(err);
-          this.msg.error('Hibás adatok');
+          this.msg.error(err.error.message);
           this.isLoading = false;
         }
       });

@@ -34,7 +34,6 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'User successfully created.',
-            'user' => $user->only('id', 'name', 'email', 'is_admin', 'created_at')
         ], 201);
     }
 

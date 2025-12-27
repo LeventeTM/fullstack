@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 // ...
@@ -13,6 +13,7 @@ import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { CategoryService } from '../../services/category';
 import { CartDrawer } from "../cart-drawer/cart-drawer";
 import { ItemCardComponent } from "../item-card/item-card";
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-menu',
@@ -43,4 +44,10 @@ products: any;
     this.categoryService.setSelected(category);
     this.router.navigate(['/']);
   }
+
+  onLogout(){
+    this.authService.logout().subscribe();
+  }
+
+  public authService = inject(AuthService);
 }

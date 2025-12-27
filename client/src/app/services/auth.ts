@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { AuthUser, LoginResponse } from '../models/user';
+import { finalize } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -11,39 +12,57 @@ export class AuthService {
 
   private apiUrl = '/api';
 
-  currentUser = signal<AuthUser | null>(null);
+  token = signal<string | null>(null);
+  role = signal<string | null>(null);
 
   constructor() {
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      this.currentUser.set(JSON.parse(storedUser));
+    const storedToken = localStorage.getItem('token');
+    const storedRole = localStorage.getItem('role');
+
+    if (storedToken) {
+      this.token.set(storedToken);
+    }
+    if (storedRole) {
+      this.role.set(storedRole);
     }
   }
 
   login(email: string, password: string) {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
       tap((response) => {
-        const userToStore: AuthUser = {
-          ...response.user,
-          token: response.access_token
-        };
-        this.currentUser.set(userToStore);
-        localStorage.setItem('currentUser', JSON.stringify(userToStore));
+        const token = response.access_token;
+        const isAdmin = response.user.is_admin ? 'admin' : 'user';
+
+        // 1. Signalok beállítása (egyszerű stringekkel)
+        this.token.set(token);
+        this.role.set(isAdmin);
+
+        // 2. LocalStorage (sima stringek, nem kell JSON.stringify)
+        localStorage.setItem('token', token);
+        localStorage.setItem('role', isAdmin);
       })
     );
   }
 
+  register(name: string, email: string, password: string, password_confirmation: string) {
+    return this.http.post<string>(`${this.apiUrl}/register`, {name, email, password, password_confirmation})
+  }
+
   logout() {
     return this.http.post(`${this.apiUrl}/logout`, {}).pipe(
-      tap(() => {
-        this.currentUser.set(null);
-        localStorage.removeItem('currentUser');
+      finalize(() => {
+        this.token.set(null);
+        this.role.set(null);
+
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+
         this.router.navigate(['/login']);
       })
     );
   }
 
   isLoggedIn(): boolean {
-    return !!this.currentUser();
+    return !!this.token();
   }
 }

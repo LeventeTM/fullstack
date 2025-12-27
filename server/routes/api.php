@@ -10,21 +10,21 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\OrderController;
 
 Route::post('login', [AuthController::class, 'login'])->name('api.login');
+Route::post('/register', [UserController::class, 'store']) -> name('api.user.store');
 Route::get('users/{user}/orders', [UserController::class, 'orders']); // kiegészítő
-Route::apiResource('items', ItemController::class);
-Route::apiResource('orders', OrderController::class);
 //Users routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [UserController::class, 'index']) -> name('api.user.users'); //gets all the users
     Route::get('/user/{user}', [UserController::class, 'show']) -> name('api.user.show'); //gets user by id
-    Route::post('/store', [UserController::class, 'store']) -> name('api.user.store');
     Route::put('/update/{user}', [UserController::class, 'update']) -> name('api.user.update');
     Route::get('/orders/{user}', [UserController::class, 'orders']) -> name('api.user.orders'); //gets all order data from the specific user
+    Route::apiResource('items', ItemController::class);
 });
 
 
 Route::middleware(['auth:sanctum', AdminMiddleware::class])->group(function () {
     Route::delete('/destroy/{user}', [UserController::class, 'destroy']) -> name('api.user.destroy');
+    Route::apiResource('orders', OrderController::class);
 });
 
 Route::middleware('auth:sanctum')->group(function () {

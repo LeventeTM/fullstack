@@ -10,7 +10,7 @@ export interface AuthUser extends User {
 
 export interface LoginResponse {
   message: string;
-  user: User;
+  user: { is_admin: number | boolean };
   access_token: string;
   token_type: string;
 }

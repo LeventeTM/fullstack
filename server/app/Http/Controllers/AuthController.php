@@ -47,7 +47,7 @@ class AuthController extends Controller
         // 4. Válasz: Visszaadjuk a tokent
         return response()->json([
             'message' => 'Sikeres bejelentkezés.',
-            'user' => $user->only('id', 'name', 'email'),
+            'user' => $user->only('is_admin'),
             'access_token' => $token,
             'token_type' => 'Bearer',
         ]);
