@@ -17,7 +17,7 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
     <nz-layout class="app-layout">
       <app-menu *ngIf="authService.isLoggedIn()"></app-menu>
 
-      <nz-content class="app-content">
+      <nz-content class="app-content" style="width: 80%;">
         <router-outlet></router-outlet>
       </nz-content>
     </nz-layout>

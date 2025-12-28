@@ -18,38 +18,32 @@ class OrderController extends Controller
     }
 
     /**
-     * Új rendelés létrehozása + tételek csatolása (pivot).
-     * Várt payload példa:
-     * {
-     *   "user_id": 1,
-     *   "status": "függőben",
-     *   "items": [
-     *     {"item_id": 10, "quantity": 2},
-     *     {"item_id": 25, "quantity": 1}
-     *   ]
-     * }
+     * Create a new order and attach items via pivot table.
+     * * This method uses a DB Transaction to ensure that the order is only
+     * saved if all items are successfully attached. It automatically
+     * retrieves the authenticated user's ID from the token for security.
      */
     public function store(Request $request)
     {
         $data = $request->validate([
-            'user_id'      => ['required','exists:users,id'],
-            'status'       => ['sometimes','string','max:255'],
-            'items'        => ['required','array','min:1'],
-            'items.*.item_id'  => ['required','integer','exists:items,id'],
-            'items.*.quantity' => ['required','integer','min:1'],
+            'status'           => ['sometimes', 'string', 'max:255'],
+            'items'            => ['required', 'array', 'min:1'],
+            'items.*.item_id'  => ['required', 'integer', 'exists:items,id'],
+            'items.*.quantity' => ['required', 'integer', 'min:1'],
         ]);
 
-        return DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($request, $data) {
             $order = Order::create([
-                'user_id'     => $data['user_id'],
+                'user_id'     => $request->user()->id,
                 'status'      => $data['status'] ?? 'függőben',
                 'total_price' => 0,
             ]);
 
             $total = 0;
+
             foreach ($data['items'] as $row) {
-                $item = Item::findOrFail($row['item_id']);
-                $qty  = $row['quantity'];
+                $item  = Item::findOrFail($row['item_id']);
+                $qty   = $row['quantity'];
                 $price = $item->price;
 
                 $order->items()->attach($item->id, [
@@ -62,7 +56,7 @@ class OrderController extends Controller
 
             $order->update(['total_price' => $total]);
 
-            return response()->json($order->load(['user','items']), 201);
+            return response()->json($order->load(['user', 'items']), 201);
         });
     }
 

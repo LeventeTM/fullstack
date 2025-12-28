@@ -39,7 +39,7 @@ export class Checkout {
 
     this.isLoading = true;
 
-    this.orderService.placeOrder(this.cartItems(), this.totalPrice()).subscribe({
+    this.orderService.placeOrder(this.cartItems()).subscribe({
       next: () => {
         this.msg.success('Rendelés sikeresen leadva!');
 

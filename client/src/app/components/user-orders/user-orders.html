@@ -1,0 +1,57 @@
+<div class="orders-container">
+  <h2>Rendeléseim</h2>
+
+  @if (isLoading()) {
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 200px;">
+      <nz-spin nzSimple nzTip="Rendelések betöltése..."></nz-spin>
+    </div>
+  } @else {
+    <nz-collapse>
+      @for (order of orders(); track order.id) {
+        <nz-collapse-panel [nzHeader]="orderTitle" [nzExtra]="statusTag">
+
+          <ng-template #orderTitle>
+            {{ order.created_at | date:'yyyy.MM.dd HH:mm' }}
+          </ng-template>
+
+          <ng-template #statusTag>
+            <nz-tag [nzColor]="order.status === 'függőben' ? 'orange' : order.status === 'pending' ? 'orange' : 'green'">
+              {{ order.status }}
+            </nz-tag>
+          </ng-template>
+
+          <nz-table #basicTable [nzData]="order.items" [nzShowPagination]="false" nzSize="small">
+            <thead>
+              <tr>
+                <th>Termék</th>
+                <th>Egységár</th>
+                <th>Mennyiség</th>
+                <th>Összesen</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of order.items; track item.name) {
+                <tr>
+                  <td>
+                    <img [src]="item.image" style="width: 30px; margin-right: 10px;">
+                    {{ item.name }}
+                  </td>
+                  <td>{{ item.pivot.price }} Ft</td>
+                  <td>{{ item.pivot.quantity }} db</td>
+                  <td>{{ item.pivot.price * item.pivot.quantity }} Ft</td>
+                </tr>
+              }
+            </tbody>
+          </nz-table>
+
+          <div style="text-align: right; margin-top: 10px;">
+            <h3>Végösszeg: {{ order.total_price }} Ft</h3>
+          </div>
+
+        </nz-collapse-panel>
+      } @empty {
+        <nz-empty nzNotFoundContent="Még nincs rendelésed"></nz-empty>
+      }
+    </nz-collapse>
+  }
+</div>

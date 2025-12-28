@@ -14,6 +14,7 @@ import { CategoryService } from '../../services/category';
 import { CartDrawer } from "../cart-drawer/cart-drawer";
 import { ItemCardComponent } from "../item-card/item-card";
 import { AuthService } from '../../services/auth';
+import { OrderService } from '../../services/order';
 
 @Component({
   selector: 'app-menu',
