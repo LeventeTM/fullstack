@@ -6,7 +6,7 @@
 
   <div class="menu-right">
     <div>
-      <div style="padding: 20px;">
+      <div style="padding: 20px">
         <app-cart-drawer></app-cart-drawer>
       </div>
 
@@ -14,7 +14,25 @@
         <app-item-card *ngFor="let p of products" [item]="p"></app-item-card>
       </div>
     </div>
-    <button style="margin-right: 20px;" *ngIf="authService.role() === 'admin'" nz-button nzType="primary" routerLink="/admin">Admin</button>
+    <button
+      style="margin-right: 20px"
+      *ngIf="authService.role() === 'admin'"
+      nz-button
+      nzType="primary"
+      routerLink="/admin"
+    >
+      Rendelések
+    </button>
+    <button
+      style="margin-right: 20px"
+      *ngIf="authService.role() === 'admin'"
+      nz-button
+      nzType="primary"
+      routerLink="/inventory"
+    >
+      Raktárkészlet
+    </button>
+
     <button nz-button (click)="onLogout()">Kijelentkezés</button>
   </div>
 </nz-header>

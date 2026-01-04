@@ -1,0 +1,267 @@
+<div
+  style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px"
+>
+  <h2 style="margin: 0">Admin – Raktárkészlet</h2>
+
+  <button nz-button nzType="primary" (click)="openAdd()">Termék hozzáadása</button>
+</div>
+
+<nz-spin [nzSpinning]="loading()">
+  <nz-table #table [nzData]="items()" [nzFrontPagination]="true">
+    <thead>
+      <tr>
+        <th>Termékkép</th>
+        <th>Kategória</th>
+        <th>Terméknév</th>
+        <th>Ár</th>
+        <th>Készlet</th>
+        <th>Súly</th>
+        <th>Módosítás</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let item of table.data">
+        <td style="width: 120px">
+          <img
+            [src]="item.image"
+            [alt]="item.name"
+            style="width: 70px; height: 70px; object-fit: cover; border-radius: 6px"
+          />
+        </td>
+        <td>{{ item.category }}</td>
+        <td>{{ item.name }}</td>
+
+        <td>{{ item.price | number }} Ft</td>
+
+        <td>{{ item.stock }}</td>
+        <td>{{ item.weight }} kg</td>
+
+        <td style="width: 160px">
+          <button
+            nz-button
+            nzType="default"
+            nzShape="circle"
+            nz-tooltip
+            nzTooltipTitle="Edit"
+            (click)="editItem(item)"
+            style="margin-right: 10px"
+          >
+            <span nz-icon nzType="edit"></span>
+          </button>
+
+          <button
+            nz-button
+            nzType="default"
+            nzShape="circle"
+            nz-tooltip
+            nzTooltipTitle="Delete"
+            (click)="deleteItem(item)"
+          >
+            <span nz-icon nzType="delete"></span>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+</nz-spin>
+<!-- EDIT MODAL -->
+<nz-modal
+  [nzVisible]="inventoryAdmin.isEditVisible()"
+  (nzVisibleChange)="onEditVisibleChange($event)"
+  nzTitle="Termék módosítása"
+  [nzOkLoading]="inventoryAdmin.isSavingEdit()"
+  (nzOnCancel)="inventoryAdmin.closeEdit()"
+  (nzOnOk)="submitEdit()"
+  nzOkText="Mentés"
+  nzCancelText="Mégse"
+>
+  <ng-container *nzModalContent>
+    <form nz-form [formGroup]="inventoryAdmin.editForm" class="edit-form">
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>Terméknév</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="Kötelező (min. 2 karakter).">
+          <input nz-input formControlName="name" placeholder="Pl. Alma" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Category SELECT -->
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>Kategória</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="Kötelező.">
+          <nz-select
+            formControlName="category"
+            nzPlaceHolder="Válassz kategóriát"
+            style="width: 100%"
+          >
+            <nz-option
+              *ngFor="let category of inventoryAdmin.categories"
+              [nzValue]="category"
+              [nzLabel]="category"
+            ></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>Ár (Ft)</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="Kötelező, nem lehet negatív.">
+          <nz-input-number
+            formControlName="price"
+            [nzMin]="0"
+            [nzStep]="1"
+            style="width: 100%"
+          ></nz-input-number>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>Készlet</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="Kötelező, nem lehet negatív.">
+          <nz-input-number
+            formControlName="stock"
+            [nzMin]="0"
+            [nzStep]="1"
+            style="width: 100%"
+          ></nz-input-number>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>Súly</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="Kötelező, nem lehet negatív.">
+          <nz-input-number
+            formControlName="weight"
+            [nzMin]="0"
+            [nzStep]="0.01"
+            style="width: 100%"
+          ></nz-input-number>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>Kép URL</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="Kötelező.">
+          <input nz-input formControlName="image" placeholder="/images/products/..." />
+        </nz-form-control>
+      </nz-form-item>
+
+      <div class="image-preview" *ngIf="inventoryAdmin.editImagePreview">
+        <div class="image-preview__label">Előnézet</div>
+        <img [src]="inventoryAdmin.editImagePreview" alt="preview" />
+      </div>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>Leírás</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="Kötelező (min. 3 karakter).">
+          <textarea
+            nz-input
+            formControlName="description"
+            rows="4"
+            placeholder="Termék leírás..."
+          ></textarea>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </ng-container>
+</nz-modal>
+
+<!-- ADD MODAL -->
+<nz-modal
+  [nzVisible]="inventoryAdmin.isAddVisible()"
+  (nzVisibleChange)="onAddVisibleChange($event)"
+  nzTitle="Termék hozzáadása"
+  [nzOkLoading]="inventoryAdmin.isSavingAdd()"
+  (nzOnCancel)="inventoryAdmin.closeAdd()"
+  (nzOnOk)="submitAdd()"
+  nzOkText="Hozzáadás"
+  nzCancelText="Mégse"
+>
+  <ng-container *nzModalContent>
+    <form nz-form [formGroup]="inventoryAdmin.addForm" class="edit-form">
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>Terméknév</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="Kötelező (min. 2 karakter).">
+          <input nz-input formControlName="name" placeholder="Pl. Alma" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>Kategória</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="Kötelező.">
+          <nz-select
+            formControlName="category"
+            nzPlaceHolder="Válassz kategóriát"
+            style="width: 100%"
+          >
+            <nz-option
+              *ngFor="let category of inventoryAdmin.categories"
+              [nzValue]="category"
+              [nzLabel]="category"
+            ></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>Ár (Ft)</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="Kötelező, nem lehet negatív.">
+          <nz-input-number
+            formControlName="price"
+            [nzMin]="0"
+            [nzStep]="1"
+            style="width: 100%"
+          ></nz-input-number>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>Készlet</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="Kötelező, nem lehet negatív.">
+          <nz-input-number
+            formControlName="stock"
+            [nzMin]="0"
+            [nzStep]="1"
+            style="width: 100%"
+          ></nz-input-number>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>Súly</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="Kötelező, nem lehet negatív.">
+          <nz-input-number
+            formControlName="weight"
+            [nzMin]="0"
+            [nzStep]="0.01"
+            style="width: 100%"
+          ></nz-input-number>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>Kép URL</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="Kötelező.">
+          <input nz-input formControlName="image" placeholder="/images/products/..." />
+        </nz-form-control>
+      </nz-form-item>
+
+      <div class="image-preview" *ngIf="inventoryAdmin.addImagePreview">
+        <div class="image-preview__label">Előnézet</div>
+        <img [src]="inventoryAdmin.addImagePreview" alt="preview" />
+      </div>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>Leírás</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="Kötelező (min. 3 karakter).">
+          <textarea
+            nz-input
+            formControlName="description"
+            rows="4"
+            placeholder="Termék leírás..."
+          ></textarea>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </ng-container>
+</nz-modal>

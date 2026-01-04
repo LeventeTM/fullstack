@@ -1,0 +1,29 @@
+:host {
+  display: block;
+  padding: 20px;
+}
+
+.edit-form {
+  padding-top: 6px;
+}
+
+.image-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 16px 0;
+  padding-left: 25%;
+}
+
+.image-preview__label {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.image-preview img {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #f0f0f0;
+}

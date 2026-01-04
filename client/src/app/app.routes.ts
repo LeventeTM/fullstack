@@ -4,16 +4,22 @@ import { authGuard } from './guards/auth.guard';
 import { loginGuard } from './guards/login.guard';
 import { adminGuard } from './guards/admin.guard';
 
+import { ItemListComponent } from './components/item-list/item-list';
+import { Admin } from './components/admin/admin';
+import { UserOrders } from './components/user-orders/user-orders';
+import { Inventory } from './components/inventory/inventory';
+
 export const routes: Routes = [
   { path: '', redirectTo: 'items', pathMatch: 'full' },
-  { path: 'login',
+  {
+    path: 'login',
     canActivate: [loginGuard],
-    loadComponent: () => import('./components/login/login').then(m => m.LoginComponent)
+    loadComponent: () => import('./components/login/login').then((m) => m.LoginComponent),
   },
   {
     path: 'register',
     canActivate: [loginGuard],
-    loadComponent: () => import('./components/register/register').then(m => m.RegisterComponent)
+    loadComponent: () => import('./components/register/register').then((m) => m.RegisterComponent),
   },
   {
     path: '',
@@ -31,9 +37,15 @@ export const routes: Routes = [
         loadComponent: () => import('./components/admin/admin').then((m) => m.Admin),
       },
       {
-        path: 'checkout', component: Checkout
+        path: 'inventory',
+        canActivate: [adminGuard],
+        component: Inventory,
       },
-    ]
+      {
+        path: 'checkout',
+        component: Checkout,
+      },
+    ],
   },
   {
     path: 'my_orders',
@@ -43,6 +55,6 @@ export const routes: Routes = [
 
   {
     path: '**',
-    redirectTo: 'items'
+    redirectTo: 'items',
   },
 ];

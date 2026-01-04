@@ -18,4 +18,16 @@ export class DataService {
 
     return this.http.get<Item[]>(`${this.api}/items`, { params });
   }
+
+  updateItem(itemId: number, payload: Partial<Item>): Observable<Item> {
+    return this.http.put<Item>(`/api/items/${itemId}`, payload);
+  }
+
+  createItem(payload: Partial<Item>): Observable<Item> {
+    return this.http.post<Item>(`${this.api}/items`, payload);
+  }
+
+  deleteItem(itemId: number): Observable<void> {
+    return this.http.delete<void>(`${this.api}/items/${itemId}`);
+  }
 }
