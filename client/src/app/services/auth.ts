@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { AuthUser, LoginResponse } from '../models/user';
 import { finalize } from 'rxjs/operators';
+import { CartService } from './cart';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -15,7 +16,7 @@ export class AuthService {
   token = signal<string | null>(null);
   role = signal<string | null>(null);
 
-  constructor() {
+  constructor(private cartService: CartService) {
     const storedToken = localStorage.getItem('token');
     const storedRole = localStorage.getItem('role');
 
@@ -53,6 +54,7 @@ export class AuthService {
       finalize(() => {
         this.token.set(null);
         this.role.set(null);
+        this.cartService.clearCart();
 
         localStorage.removeItem('token');
         localStorage.removeItem('role');
