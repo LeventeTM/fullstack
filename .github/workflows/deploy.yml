@@ -1,0 +1,34 @@
+name: CD Deploy (git pull + build on VPS)
+
+on:
+  push:
+    branches: ["main"]
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH (pull & build)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            set -e
+            cd /home/vanda/fullstack-repo
+            git fetch --all
+            git reset --hard origin/main
+
+            docker compose build
+            docker compose up -d --remove-orphans
+
+            docker compose exec -T server php artisan optimize:clear || true
+            docker compose exec -T server php artisan migrate --force || true
+            docker compose exec -T server php artisan config:cache || true
+            docker compose exec -T server php artisan route:cache || true
