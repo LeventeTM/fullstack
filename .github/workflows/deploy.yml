@@ -1,8 +1,11 @@
-name: CD Deploy (git pull + build on VPS)
+name: CD Deploy (Build on VPS with Docker Compose)
 
 on:
   push:
     branches: ["main"]
+
+permissions:
+  contents: read
 
 concurrency:
   group: deploy-main
@@ -11,24 +14,35 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Deploy via SSH (pull & build)
+      - name: Deploy on VPS via SSH (git pull + docker compose build)
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          password: ${{ secrets.VPS_PASSWORD }}
           port: ${{ secrets.VPS_PORT }}
+          key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            set -e
-            cd /home/vanda/fullstack-repo
-            git fetch --all
+            set -euo pipefail
+
+            APP_DIR="${{ secrets.VPS_APP_DIR }}"
+            cd "$APP_DIR"
+
+            # Make sure the repo exists here and has origin set to your GitHub repo.
+            # This will update the working tree to match main exactly.
+            git fetch --all --prune
             git reset --hard origin/main
 
+            # Build and start containers using local Dockerfiles (no registry involved)
             docker compose build
             docker compose up -d --remove-orphans
 
+            # Laravel post-deploy (best-effort)
             docker compose exec -T server php artisan optimize:clear || true
             docker compose exec -T server php artisan migrate --force || true
             docker compose exec -T server php artisan config:cache || true
             docker compose exec -T server php artisan route:cache || true
+
+            # Optional cleanup of dangling images
+            docker image prune -f
